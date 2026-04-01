@@ -1,0 +1,5 @@
+{
+  "typescript.tsserver.experimental.enableProjectDiagnostics": false,
+  "typescript.preferences.includePackageJsonAutoImports": "on",
+  "typescript.tsdk": "mobile/node_modules/typescript/lib"
+}
