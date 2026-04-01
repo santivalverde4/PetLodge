@@ -1,5 +1,6 @@
 # Aplicación Móvil PetLodge
 
+
 Una aplicación móvil React Native para el sistema de gestión de la guardería de mascotas PetLodge, construida con Expo. Esta aplicación permite a los propietarios de mascotas gestionar sus mascotas, ver reservas e hacer nuevas reservaciones.
 
 ## Características
