@@ -14,6 +14,7 @@ REST API for the PetLodge pet hotel management system.
 | Storage    | AWS S3                              |
 | Docs       | Swagger / OpenAPI 3                 |
 | Validation | class-validator + class-transformer |
+| Logging    | Winston + nest-winston              |
 
 ## Modules
 

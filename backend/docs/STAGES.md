@@ -22,6 +22,8 @@ Stages 3, 4, and 5 can be developed in parallel once Stage 2 is complete.
 - [x] Create `PrismaService`: extends `PrismaClient` with `PrismaNeonHttp` adapter, calls `$connect()` on `OnModuleInit` and `$disconnect()` on `OnModuleDestroy`.
 - [x] Create `PrismaModule`: declares and exports `PrismaService`, marked `@Global()`.
 - [x] Configure `main.ts`: global `ValidationPipe` with `whitelist: true` and `forbidNonWhitelisted: true`, `enableCors()`, and Swagger at `/api` with Bearer auth.
+- [x] Create `LoggerModule` (global): Winston-backed logger with colored output in development and structured JSON in production. Replaces NestJS default logger via `WINSTON_MODULE_NEST_PROVIDER`.
+- [x] Create `LoggingInterceptor` (global): logs every HTTP request with method, path, status code, duration, and user ID.
 
 **Done when:** Server starts without errors and Swagger UI loads at `/api`.
 

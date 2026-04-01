@@ -10,7 +10,14 @@ url.searchParams.set('options', '-c search_path=neon_auth');
 
 export const auth = betterAuth({
   secret: process.env.BETTER_AUTH_SECRET,
-  logger: { level: 'error' },
+  logger: {
+    level: 'error',
+    log: (level, message, ...args) => {
+      // Route Better Auth logs through the same process logger
+      const entry = `[BetterAuth] ${message}`;
+      if (level === 'error') process.stderr.write(entry + '\n');
+    },
+  },
   database: new Pool({ connectionString: url.toString() }),
   emailAndPassword: {
     enabled: true,
