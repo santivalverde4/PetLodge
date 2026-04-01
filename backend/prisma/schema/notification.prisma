@@ -1,0 +1,32 @@
+enum TipoNotificacion {
+  REGISTRO_USUARIO
+  CONFIRMACION_RESERVA
+  MODIFICACION_RESERVA
+  INICIO_HOSPEDAJE
+  FIN_HOSPEDAJE
+  ESTADO_MASCOTA
+}
+
+model NotificationTemplate {
+  id        String             @id @default(uuid())
+  tipo      TipoNotificacion   @unique
+  name      String
+  subject   String
+  body      String
+  variables String[]
+  logs      NotificationLog[]
+}
+
+model NotificationLog {
+  id         String               @id @default(uuid())
+  tipo       TipoNotificacion
+  enviado    Boolean              @default(false)
+  error      String?
+  fechaEnvio DateTime             @default(now())
+  userId     String
+  user       User                 @relation(fields: [userId], references: [id])
+  reservaId  String?
+  reserva    Reservation?         @relation(fields: [reservaId], references: [id])
+  templateId String
+  template   NotificationTemplate @relation(fields: [templateId], references: [id])
+}

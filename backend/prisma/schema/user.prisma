@@ -1,0 +1,16 @@
+model User {
+  // id is the same UUID as neon_auth.user.id — set explicitly on register
+  // role is owned by neon_auth.user.role, not stored here
+  id                   String            @id
+  nombre               String
+  numeroIdentificacion String            @unique
+  email                String            @unique
+  numeroTelefono       String?
+  direccion            String?
+  foto                 String?           // DiceBear URL by default, Supabase/S3 URL if uploaded
+  isActive             Boolean           @default(true)
+  fechaRegistro        DateTime          @default(now())
+  pets                 Pet[]
+  reservations         Reservation[]
+  notificationLogs     NotificationLog[]
+}
