@@ -13,36 +13,36 @@ import { ScreenProps } from '@/src/types';
 import { styles } from './RegisterScreen.styles';
 
 export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
-  const [name, setName] = useState('');
-  const [idNumber, setIdNumber] = useState('');
+  const [nombre, setNombre] = useState('');
+  const [numeroIdentificacion, setNumeroIdentificacion] = useState('');
   const [email, setEmail] = useState('');
-  const [phoneNumber, setPhoneNumber] = useState('');
-  const [address, setAddress] = useState('');
+  const [numeroTelefono, setNumeroTelefono] = useState('');
+  const [direccion, setDireccion] = useState('');
   const [password, setPassword] = useState('');
 
-  const [nameError, setNameError] = useState('');
-  const [idNumberError, setIdNumberError] = useState('');
+  const [nombreError, setNombreError] = useState('');
+  const [numeroIdentificacionError, setNumeroIdentificacionError] = useState('');
   const [emailError, setEmailError] = useState('');
-  const [phoneNumberError, setPhoneNumberError] = useState('');
-  const [addressError, setAddressError] = useState('');
+  const [numeroTelefonoError, setNumeroTelefonoError] = useState('');
+  const [direccionError, setDireccionError] = useState('');
   const [passwordError, setPasswordError] = useState('');
 
   const validateForm = () => {
     let isValid = true;
-    setNameError('');
-    setIdNumberError('');
+    setNombreError('');
+    setNumeroIdentificacionError('');
     setEmailError('');
-    setPhoneNumberError('');
-    setAddressError('');
+    setNumeroTelefonoError('');
+    setDireccionError('');
     setPasswordError('');
 
-    if (!name) {
-      setNameError('El nombre completo es requerido');
+    if (!nombre) {
+      setNombreError('El nombre completo es requerido');
       isValid = false;
     }
 
-    if (!idNumber) {
-      setIdNumberError('El número de identificación es requerido');
+    if (!numeroIdentificacion) {
+      setNumeroIdentificacionError('El número de identificación es requerido');
       isValid = false;
     }
 
@@ -54,13 +54,13 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
       isValid = false;
     }
 
-    if (!phoneNumber) {
-      setPhoneNumberError('El número de teléfono es requerido');
+    if (!numeroTelefono) {
+      setNumeroTelefonoError('El número de teléfono es requerido');
       isValid = false;
     }
 
-    if (!address) {
-      setAddressError('La dirección es requerida');
+    if (!direccion) {
+      setDireccionError('La dirección es requerida');
       isValid = false;
     }
 
@@ -78,6 +78,7 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
   const handleRegister = () => {
     if (!validateForm()) return;
 
+    // TODO: Call POST /auth/register with { nombre, numeroIdentificacion, email, password, numeroTelefono, direccion }
     navigation.getParent()?.getParent()?.replace('User');
   };
 
@@ -97,24 +98,24 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
             <Input
               label="Nombre completo"
               placeholder="Juan Pérez"
-              value={name}
+              value={nombre}
               onChangeText={(text) => {
-                setName(text);
-                setNameError('');
+                setNombre(text);
+                setNombreError('');
               }}
-              error={nameError}
+              error={nombreError}
               required
             />
 
             <Input
               label="Número de identificación"
               placeholder="123456789"
-              value={idNumber}
+              value={numeroIdentificacion}
               onChangeText={(text) => {
-                setIdNumber(text);
-                setIdNumberError('');
+                setNumeroIdentificacion(text);
+                setNumeroIdentificacionError('');
               }}
-              error={idNumberError}
+              error={numeroIdentificacionError}
               required
             />
 
@@ -134,25 +135,25 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
             <Input
               label="Número de teléfono"
               placeholder="70606547"
-              value={phoneNumber}
+              value={numeroTelefono}
               onChangeText={(text) => {
-                setPhoneNumber(text);
-                setPhoneNumberError('');
+                setNumeroTelefono(text);
+                setNumeroTelefonoError('');
               }}
               keyboardType="phone-pad"
-              error={phoneNumberError}
+              error={numeroTelefonoError}
               required
             />
 
             <Input
               label="Dirección"
               placeholder="Calle Principal 123, Madrid"
-              value={address}
+              value={direccion}
               onChangeText={(text) => {
-                setAddress(text);
-                setAddressError('');
+                setDireccion(text);
+                setDireccionError('');
               }}
-              error={addressError}
+              error={direccionError}
               required
             />
 
