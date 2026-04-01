@@ -23,10 +23,13 @@ import * as winston from 'winston';
           winston.format.timestamp({ format: 'HH:mm:ss' }),
           winston.format.errors({ stack: true }),
           winston.format.printf(({ level, message, timestamp, context, stack }) => {
-            const ctx = context ? ` [${context}]` : '';
-            return stack
-              ? `${timestamp}${ctx} ${level}: ${message}\n${stack}`
-              : `${timestamp}${ctx} ${level}: ${message}`;
+            const ctx = typeof context === 'string' && context ? ` [${context}]` : '';
+            const ts = typeof timestamp === 'string' ? timestamp : '';
+            const msg = typeof message === 'string' ? message : String(message);
+            const stackStr = typeof stack === 'string' ? stack : undefined;
+            return stackStr
+              ? `${ts}${ctx} ${level}: ${msg}\n${stackStr}`
+              : `${ts}${ctx} ${level}: ${msg}`;
           }),
         );
 

@@ -1,9 +1,4 @@
-import {
-  BadRequestException,
-  ConflictException,
-  Injectable,
-  UnauthorizedException,
-} from '@nestjs/common';
+import { ConflictException, Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcryptjs';
 import { User } from '../../generated/prisma/client';
@@ -21,10 +16,7 @@ export class AuthService {
   async register(dto: RegisterDto) {
     const existing = await this.prisma.user.findFirst({
       where: {
-        OR: [
-          { email: dto.email },
-          { numeroIdentificacion: dto.numeroIdentificacion },
-        ],
+        OR: [{ email: dto.email }, { numeroIdentificacion: dto.numeroIdentificacion }],
       },
     });
 

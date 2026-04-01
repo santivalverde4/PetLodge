@@ -1,19 +1,21 @@
 import { ApiPropertyOptional } from '@nestjs/swagger';
-import { IsOptional, IsString } from 'class-validator';
+import { IsOptional, IsString, Matches } from 'class-validator';
 
 export class UpdateUserDto {
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'El nombre no es válido' })
   nombre?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
+  @Matches(/^\+?[\d\s\-()]{7,20}$/, {
+    message: 'El número de teléfono no es válido',
+  })
   numeroTelefono?: string;
 
   @ApiPropertyOptional()
   @IsOptional()
-  @IsString()
+  @IsString({ message: 'La dirección no es válida' })
   direccion?: string;
 }

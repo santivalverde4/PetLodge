@@ -21,7 +21,9 @@ export class RegisterDto {
 
   @ApiPropertyOptional()
   @IsOptional()
-  @Matches(/^\+?[\d\s\-()]{7,20}$/, { message: 'El número de teléfono no es válido' })
+  @Matches(/^\+?[\d\s\-()]{7,20}$/, {
+    message: 'El número de teléfono no es válido',
+  })
   numeroTelefono?: string;
 
   @ApiPropertyOptional()
