@@ -5,8 +5,8 @@ import { JwtModule } from '@nestjs/jwt';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { PrismaModule } from './prisma/prisma.module';
-import { AuthModule } from './auth/auth.module';
 import { LoggerModule } from './logger/logger.module';
+import { ApiModule } from './api/api.module';
 import { SessionGuard } from './common/guards/session.guard';
 import { RolesGuard } from './common/guards/roles.guard';
 import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
@@ -14,6 +14,7 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
 
 @Module({
   imports: [
+    // Infrastructure — config, JWT, logging, and database
     ConfigModule.forRoot({ isGlobal: true }),
     JwtModule.registerAsync({
       global: true,
@@ -25,7 +26,8 @@ import { HttpExceptionFilter } from './common/filters/http-exception.filter';
     }),
     LoggerModule,
     PrismaModule,
-    AuthModule,
+    // Feature modules — all routes live under ApiModule
+    ApiModule,
   ],
   controllers: [AppController],
   providers: [

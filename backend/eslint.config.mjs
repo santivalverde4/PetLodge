@@ -38,7 +38,7 @@ export default tseslint.config(
       '@typescript-eslint/no-explicit-any': 'warn',
 
       // Unused variables indicate dead code; prefix with _ to intentionally ignore
-      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_' }],
+      '@typescript-eslint/no-unused-vars': ['error', { argsIgnorePattern: '^_', varsIgnorePattern: '^_' }],
 
       // Unsafe operations — warn rather than error to allow guard/decorator patterns
       '@typescript-eslint/no-unsafe-argument': 'warn',

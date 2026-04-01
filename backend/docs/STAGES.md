@@ -63,9 +63,17 @@ Stages 3, 4, and 5 can be developed in parallel once Stage 2 is complete.
 
 **Goal:** Authenticated users can read, update, and deactivate their own profile.
 
-- [ ] `GET /users/me`: Return the authenticated user's profile. Response must match the `Usuario` type — exclude `password`, include `fechaRegistro` as ISO string.
-- [ ] `PATCH /users/me`: Accept optional `nombre`, `numeroTelefono`, `direccion`. `email` and `numeroIdentificacion` must not be updatable. Return the updated `Usuario`.
-- [ ] `DELETE /users/me`: Soft-delete the account by setting `isActive = false`. Return `204 No Content`.
+All routes require a valid JWT bearer token (enforced globally by `SessionGuard`).
+
+- [x] `GET /users/me`: Return the authenticated user's profile. Excludes `password`. `fechaRegistro` is returned as an ISO string. Response matches the `Usuario` frontend type.
+- [x] `PATCH /users/me`: Accept optional `nombre`, `numeroTelefono`, `direccion`. `email` and `numeroIdentificacion` are intentionally not updatable. Returns the updated profile.
+- [x] `DELETE /users/me`: Soft-delete by setting `isActive = false`. Returns `204 No Content`.
+
+**Implementation notes:**
+- `UsersService` — `getProfile`, `update`, `deactivate` methods. Uses global `PrismaModule`.
+- `UsersController` — `@ApiBearerAuth()` applied at class level; uses `@CurrentUser()` param decorator to read `req.currentUser`.
+- `UsersModule` — no extra imports needed (`PrismaModule` is global).
+- Password is stripped in `toResponse` via destructuring before returning any user object.
 
 **Done when:** Full profile lifecycle works end-to-end via Swagger. Password is never returned in any response.
 
