@@ -103,7 +103,7 @@ All routes require a valid JWT bearer token (enforced globally by `SessionGuard`
 
 **Goal:** Room records exist in the DB and clients can query availability for a date range.
 
-- [ ] Create a Prisma seed script that inserts a fixed set of rooms (e.g. 10 standard + 5 special). Register the seed command in `package.json` under `prisma.seed`.
+- [X] Create a Prisma seed script that inserts a fixed set of rooms (e.g. 10 standard + 5 special). Register the seed command in `package.json` under `prisma.seed`.
 - [ ] `GET /rooms`: Return all rooms.
 - [ ] `GET /rooms/available?from=YYYY-MM-DD&to=YYYY-MM-DD`: Validate that both query params are valid dates. Return rooms where no reservation with `estado` in `(en progreso, confirmada)` has an overlapping date range. Overlap condition: `fechaEntrada < to AND fechaSalida > from`.
 

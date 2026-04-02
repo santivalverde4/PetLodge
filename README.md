@@ -16,6 +16,12 @@ Una aplicación móvil React Native para el sistema de gestión de la guardería
 1. Instalar dependencias
 
    ```bash
+   # En la carpeta backend
+   cd backend
+   npm install
+
+   # En la carpeta frontend (en otra terminal)
+   cd frontend
    npm install
    ```
 
@@ -29,6 +35,7 @@ Una aplicación móvil React Native para el sistema de gestión de la guardería
    - Presiona `a` para Android Emulator (por ejemplo, emulador de Android Studio)
    - Presiona `w` para Web
    - O escanea el código QR con la aplicación Expo Go
+
 
 ## Tech Stack
 
