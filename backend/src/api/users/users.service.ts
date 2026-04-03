@@ -4,6 +4,7 @@ import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 type UserResponse = Omit<User, 'password' | 'fechaRegistro'> & { fechaRegistro: string };
+type UserWithRole = User & { role?: string };
 
 @Injectable()
 export class UsersService {
@@ -29,8 +30,8 @@ export class UsersService {
     });
   }
 
-  private toResponse(user: User): UserResponse {
-    const { password: _password, fechaRegistro, ...rest } = user;
+  private toResponse(user: UserWithRole): UserResponse {
+    const { password: _password, role: _role, fechaRegistro, ...rest } = user;
     return { ...rest, fechaRegistro: fechaRegistro.toISOString() };
   }
 }
