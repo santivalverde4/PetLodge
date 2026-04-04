@@ -149,6 +149,86 @@ describe('NotificationsService', () => {
     });
   });
 
+  it('returns the authenticated user notification log ordered by send date', async () => {
+    prisma.notificationLog.findMany.mockResolvedValueOnce([
+      {
+        id: 'log-2',
+        tipo: TipoNotificacion.CONFIRMACION_RESERVA,
+        enviado: true,
+        error: null,
+        fechaEnvio: new Date('2026-04-04T10:00:00.000Z'),
+        reservaId: 'reservation-1',
+        template: {
+          id: 'template-2',
+          tipo: TipoNotificacion.CONFIRMACION_RESERVA,
+          name: 'Confirmacion de reserva',
+          subject: 'Tu reserva esta confirmada',
+        },
+      },
+      {
+        id: 'log-1',
+        tipo: TipoNotificacion.REGISTRO_USUARIO,
+        enviado: false,
+        error: 'SMTP connection failed',
+        fechaEnvio: new Date('2026-04-03T09:30:00.000Z'),
+        reservaId: null,
+        template: {
+          id: 'template-1',
+          tipo: TipoNotificacion.REGISTRO_USUARIO,
+          name: 'Bienvenida de usuario',
+          subject: 'Bienvenido a PetLodge',
+        },
+      },
+    ]);
+
+    const result = await service.findLogs(user.id);
+
+    expect(result).toEqual([
+      {
+        id: 'log-2',
+        tipo: TipoNotificacion.CONFIRMACION_RESERVA,
+        enviado: true,
+        error: null,
+        fechaEnvio: '2026-04-04T10:00:00.000Z',
+        reservaId: 'reservation-1',
+        template: {
+          id: 'template-2',
+          tipo: TipoNotificacion.CONFIRMACION_RESERVA,
+          name: 'Confirmacion de reserva',
+          subject: 'Tu reserva esta confirmada',
+        },
+      },
+      {
+        id: 'log-1',
+        tipo: TipoNotificacion.REGISTRO_USUARIO,
+        enviado: false,
+        error: 'SMTP connection failed',
+        fechaEnvio: '2026-04-03T09:30:00.000Z',
+        reservaId: null,
+        template: {
+          id: 'template-1',
+          tipo: TipoNotificacion.REGISTRO_USUARIO,
+          name: 'Bienvenida de usuario',
+          subject: 'Bienvenido a PetLodge',
+        },
+      },
+    ]);
+    expect(prisma.notificationLog.findMany).toHaveBeenCalledWith({
+      where: { userId: user.id },
+      include: {
+        template: {
+          select: {
+            id: true,
+            tipo: true,
+            name: true,
+            subject: true,
+          },
+        },
+      },
+      orderBy: { fechaEnvio: 'desc' },
+    });
+  });
+
   it('sends the email, replaces placeholders, and writes a success log', async () => {
     prisma.notificationLog.create.mockResolvedValue({ id: 'log-success' });
 
