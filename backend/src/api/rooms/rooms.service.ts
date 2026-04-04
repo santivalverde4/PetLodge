@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Room } from '../../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 
 type RoomResponse = {
@@ -10,34 +11,25 @@ type RoomResponse = {
 export class RoomsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async findAll(): Promise<RoomResponse[]> {
-    const rooms = await this.prisma.room.findMany({
+  async findAll(): Promise<Room[]> {
+    return this.prisma.room.findMany({
       orderBy: { numero: 'asc' },
     });
-
-    return rooms.map((room) => ({
-      id: room.id,
-      name: `Habitación ${room.numero}`,
-    }));
   }
 
-  async findAvailable(from: string, to: string): Promise<RoomResponse[]> {
-    const fromDate = new Date(from);
-    const toDate = new Date(to);
-
-    if (Number.isNaN(fromDate.getTime()) || Number.isNaN(toDate.getTime())) {
-      throw new BadRequestException('Las fechas from y to deben ser válidas');
-    }
+  async findAvailable(from: string, to: string): Promise<Room[]> {
+    const fromDate = this.parseDateOnly(from, 'from');
+    const toDate = this.parseDateOnly(to, 'to');
 
     if (fromDate >= toDate) {
-      throw new BadRequestException('La fecha from debe ser menor que to');
+      throw new BadRequestException('La fecha from debe ser anterior a la fecha to');
     }
 
-    const rooms = await this.prisma.room.findMany({
+    return this.prisma.room.findMany({
       where: {
         reservations: {
           none: {
-            estado: { in: ['CONFIRMADA', 'EN_PROGRESO'] },
+            estado: { in: ['en progreso', 'confirmada'] },
             fechaEntrada: { lt: toDate },
             fechaSalida: { gt: fromDate },
           },
@@ -45,10 +37,24 @@ export class RoomsService {
       },
       orderBy: { numero: 'asc' },
     });
+  }
 
-    return rooms.map((room) => ({
-      id: room.id,
-      name: `Habitación ${room.numero}`,
-    }));
+  private parseDateOnly(value: string, fieldName: 'from' | 'to'): Date {
+    const [yearText, monthText, dayText] = value.split('-');
+    const year = Number(yearText);
+    const month = Number(monthText);
+    const day = Number(dayText);
+    const date = new Date(Date.UTC(year, month - 1, day));
+
+    if (
+      Number.isNaN(date.getTime()) ||
+      date.getUTCFullYear() !== year ||
+      date.getUTCMonth() !== month - 1 ||
+      date.getUTCDate() !== day
+    ) {
+      throw new BadRequestException(`La fecha ${fieldName} no es valida`);
+    }
+
+    return date;
   }
 }

@@ -1,30 +1,43 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsBoolean, IsDateString, IsOptional, IsString, IsUUID, MaxLength } from 'class-validator';
+import { IsArray, IsIn, IsNotEmpty, IsOptional, IsString } from 'class-validator';
+
+const RESERVATION_TYPES = ['estandar', 'especial'] as const;
+const ADDITIONAL_SERVICES = ['bano', 'paseo', 'alimentacion especial'] as const;
 
 export class CreateReservationDto {
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID('4', { message: 'mascotaId debe ser un UUID válido' })
+  @ApiProperty({ example: '8cbba379-262f-4ae8-b934-a4a4c396c77d' })
+  @IsString()
+  @IsNotEmpty()
   mascotaId: string;
 
-  @ApiProperty({ format: 'uuid' })
-  @IsUUID('4', { message: 'habitacionId debe ser un UUID válido' })
+  @ApiProperty({ example: '4f9a0d6c-7e2b-4a7c-a9bb-7f6ef6f5b2e1' })
+  @IsString()
+  @IsNotEmpty()
   habitacionId: string;
 
-  @ApiProperty({ example: '2026-04-15' })
-  @IsDateString({}, { message: 'fechaEntrada debe ser una fecha válida (YYYY-MM-DD)' })
+  @ApiProperty({ example: '2026-04-10' })
+  @IsString()
+  @IsNotEmpty()
   fechaEntrada: string;
 
-  @ApiProperty({ example: '2026-04-20' })
-  @IsDateString({}, { message: 'fechaSalida debe ser una fecha válida (YYYY-MM-DD)' })
+  @ApiProperty({ example: '2026-04-12' })
+  @IsString()
+  @IsNotEmpty()
   fechaSalida: string;
 
-  @ApiProperty({ example: false })
-  @IsBoolean({ message: 'esEspecial debe ser booleano' })
-  esEspecial: boolean;
+  @ApiProperty({ enum: RESERVATION_TYPES, example: 'especial' })
+  @IsString()
+  @IsIn(RESERVATION_TYPES)
+  tipoHospedaje: (typeof RESERVATION_TYPES)[number];
 
-  @ApiPropertyOptional({ example: 'paseo diario' })
+  @ApiPropertyOptional({
+    type: [String],
+    enum: ADDITIONAL_SERVICES,
+    example: ['bano', 'paseo'],
+  })
   @IsOptional()
-  @IsString({ message: 'serviciosAdicionales debe ser texto' })
-  @MaxLength(255, { message: 'serviciosAdicionales no puede exceder 255 caracteres' })
-  serviciosAdicionales?: string;
+  @IsArray()
+  @IsString({ each: true })
+  @IsIn(ADDITIONAL_SERVICES, { each: true })
+  serviciosAdicionales?: string[];
 }

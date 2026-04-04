@@ -116,9 +116,9 @@ All routes require a valid JWT bearer token (enforced globally by `SessionGuard`
 
 **Goal:** Room records exist in the DB and clients can query availability for a date range.
 
-- [ ] Create a Prisma seed script that inserts a fixed set of rooms (e.g. 10 standard + 5 special). Register the seed command in `package.json` under `prisma.seed`.
-- [ ] `GET /rooms`: Return all rooms. Response must match the frontend `Habitacion` type: `{ id: number, name: string }`.
-- [ ] `GET /rooms/available?from=YYYY-MM-DD&to=YYYY-MM-DD`: Validate that both query params are valid dates. Return rooms where no reservation with `estado` in `(en progreso, confirmada)` has an overlapping date range. Overlap condition: `fechaEntrada < to AND fechaSalida > from`.
+- [x] Create a Prisma seed script that inserts a fixed set of rooms (e.g. 10 standard + 5 special). Register the seed command in `package.json` under `prisma.seed`.
+- [x] `GET /rooms`: Return all rooms. Response must match the frontend `Habitacion` type: `{ id: number, name: string }`.
+- [x] `GET /rooms/available?from=YYYY-MM-DD&to=YYYY-MM-DD`: Validate that both query params are valid dates. Return rooms where no reservation with `estado` in `(en progreso, confirmada)` has an overlapping date range. Overlap condition: `fechaEntrada < to AND fechaSalida > from`.
 
 **Frontend contract note:** `Habitacion.id` is typed as `number` in the frontend but the DB will use UUID strings. Align at integration time.
 
@@ -158,8 +158,8 @@ All routes require a valid JWT bearer token (enforced globally by `SessionGuard`
 
 **Goal:** Emails are sent automatically on key actions using templates stored in the database.
 
-- [ ] Add `NotificationTemplate` seeding to the Prisma seed script. Insert one record per notification type. Template body uses `{{key}}` placeholders. The `name`, `subject`, and `body` fields must match the `NotificationTemplate` mobile type.
-- [ ] Create `NotificationsService`:
+- [X] Add `NotificationTemplate` seeding to the Prisma seed script. Insert one record per notification type. Template body uses `{{key}}` placeholders. The `name`, `subject`, and `body` fields must match the `NotificationTemplate` mobile type.
+- [X] Create `NotificationsService`:
   - `send(templateId, userId, variables?, reservaId?)`:
     1. Load the template from DB.
     2. Load the user's email and `nombre` from DB.
@@ -170,12 +170,12 @@ All routes require a valid JWT bearer token (enforced globally by `SessionGuard`
   - `findOne(id)`: return one template by id, throw `404` if not found.
   - `update(id, dto)`: update `subject` and/or `body`.
   - `findLogs(userId)`: return send history for the user, ordered by `fechaEnvio` descending.
-- [ ] Wire `NotificationsService` into `AuthService` (call on register) and `ReservationsService` (call on create and update).
-- [ ] `GET /notifications/templates`: return all templates.
-- [ ] `GET /notifications/templates/:id`: return one template.
-- [ ] `PATCH /notifications/templates/:id`: update `subject` and/or `body`.
-- [ ] `POST /notifications/send/:id`: manually trigger a send for a given template (for testing).
-- [ ] `GET /notifications/logs`: return the authenticated user's send log.
+- [TEST] Wire `NotificationsService` into `AuthService` (call on register) and `ReservationsService` (call on create and update).
+- [x] `GET /notifications/templates`: return all templates.
+- [x] `GET /notifications/templates/:id`: return one template.
+- [x] `PATCH /notifications/templates/:id`: update `subject` and/or `body`.
+- [x] `POST /notifications/send/:id`: manually trigger a send for a given template (for testing).
+- [x] `GET /notifications/logs`: return the authenticated user's send log.
 
 **Done when:** Registering a user and creating/modifying a reservation trigger real emails. The send log reflects success or failure per notification.
 
