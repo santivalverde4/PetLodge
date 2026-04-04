@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, ConflictException } from '@nestjs/common';
 import { User } from '../../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -15,6 +15,34 @@ export class UsersService {
   }
 
   async update(userId: string, dto: UpdateUserDto): Promise<UserResponse> {
+    // Check if email or numeroIdentificacion already exist on another user
+    if (dto.email || dto.numeroIdentificacion) {
+      const existing = await this.prisma.user.findFirst({
+        where: {
+          AND: [
+            {
+              OR: [
+                { email: dto.email },
+                { numeroIdentificacion: dto.numeroIdentificacion },
+              ],
+            },
+            {
+              NOT: { id: userId },  // Exclude current user
+            },
+          ],
+        },
+      });
+
+      if (existing) {
+        if (existing.email === dto.email) {
+          throw new ConflictException('El correo ya está registrado');
+        }
+        if (existing.numeroIdentificacion === dto.numeroIdentificacion) {
+          throw new ConflictException('El número de identificación ya está registrado');
+        }
+      }
+    }
+
     const updated = await this.prisma.user.update({
       where: { id: userId },
       data: dto,
