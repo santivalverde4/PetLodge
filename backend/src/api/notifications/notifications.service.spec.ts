@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config';
+import { NotFoundException } from '@nestjs/common';
 import { TipoNotificacion } from '../../../generated/prisma/client';
 import { NotificationsService } from './notifications.service';
 
@@ -6,6 +7,7 @@ describe('NotificationsService', () => {
   const template = {
     id: 'template-1',
     tipo: TipoNotificacion.REGISTRO_USUARIO,
+    name: 'Registro de usuario',
     subject: 'Bienvenido {{name}}{{missingSuffix}}',
     body:
       'Hola {{name}},\n\nTu correo es {{email}}.\n\nMascota: {{petName}}\nHabitacion: {{roomNumber}}',
@@ -21,7 +23,7 @@ describe('NotificationsService', () => {
 
   let service: NotificationsService;
   let prisma: {
-    notificationTemplate: { findUnique: jest.Mock };
+    notificationTemplate: { findMany: jest.Mock; findUnique: jest.Mock };
     user: { findUnique: jest.Mock };
     reservation: { findUnique: jest.Mock };
     notificationLog: { create: jest.Mock; findMany: jest.Mock };
@@ -37,6 +39,7 @@ describe('NotificationsService', () => {
   beforeEach(() => {
     prisma = {
       notificationTemplate: {
+        findMany: jest.fn().mockResolvedValue([template]),
         findUnique: jest.fn().mockResolvedValue(template),
       },
       user: {
@@ -75,6 +78,33 @@ describe('NotificationsService', () => {
 
   afterEach(() => {
     jest.restoreAllMocks();
+  });
+
+  it('returns all notification templates ordered by type', async () => {
+    const result = await service.findAll();
+
+    expect(result).toEqual([template]);
+    expect(prisma.notificationTemplate.findMany).toHaveBeenCalledWith({
+      orderBy: { tipo: 'asc' },
+    });
+  });
+
+  it('returns one notification template by id', async () => {
+    const result = await service.findOne(template.id);
+
+    expect(result).toEqual(template);
+    expect(prisma.notificationTemplate.findUnique).toHaveBeenCalledWith({
+      where: { id: template.id },
+    });
+  });
+
+  it('throws not found when the notification template does not exist', async () => {
+    prisma.notificationTemplate.findUnique.mockResolvedValueOnce(null);
+
+    await expect(service.findOne('missing-template')).rejects.toThrow(NotFoundException);
+    expect(prisma.notificationTemplate.findUnique).toHaveBeenCalledWith({
+      where: { id: 'missing-template' },
+    });
   });
 
   it('sends the email, replaces placeholders, and writes a success log', async () => {
