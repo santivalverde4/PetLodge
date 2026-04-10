@@ -73,89 +73,115 @@ export const petsService = {
   },
 
   async createPet(data: CreatePetRequest): Promise<PetResponse> {
-    const formData = new FormData();
-    
-    formData.append('nombre', data.nombre);
-    formData.append('tipo', data.tipo);
-    formData.append('raza', data.raza);
-    formData.append('anos', String(data.anos));
-    formData.append('meses', String(data.meses));
-    formData.append('sexo', data.sexo);
-    formData.append('tamano', data.tamano);
-    formData.append('estadoVacunacion', data.estadoVacunacion);
-    formData.append('condicionesMedicas', data.condicionesMedicas);
-    formData.append('numeroVeterinario', data.numeroVeterinario);
-    formData.append('cuidadosEspeciales', data.cuidadosEspeciales);
-    
-    if (data.foto?.isPicker && data.foto?.uri) {
-      formData.append('foto', {
-        uri: data.foto.uri,
-        type: 'image/jpeg',
-        name: 'pet-photo.jpg',
-      } as any);
+    try {
+      console.log('🐾 Creating pet with data:', data);
+      const formData = new FormData();
+      
+      formData.append('nombre', data.nombre);
+      formData.append('tipo', data.tipo);
+      formData.append('raza', data.raza);
+      formData.append('anos', String(data.anos));
+      formData.append('meses', String(data.meses));
+      formData.append('sexo', data.sexo);
+      formData.append('tamano', data.tamano);
+      formData.append('estadoVacunacion', data.estadoVacunacion);
+      formData.append('condicionesMedicas', data.condicionesMedicas);
+      formData.append('numeroVeterinario', data.numeroVeterinario);
+      formData.append('cuidadosEspeciales', data.cuidadosEspeciales);
+      
+      if (data.foto?.isPicker && data.foto?.uri) {
+        console.log('📷 Adding photo:', data.foto.uri);
+        formData.append('foto', {
+          uri: data.foto.uri,
+          type: 'image/jpeg',
+          name: 'pet-photo.jpg',
+        } as any);
+      }
+
+      const token = await AsyncStorage.getItem('auth_token');
+      const url = `${process.env.EXPO_PUBLIC_API_BASE_URL}/pets`;
+      console.log('📤 Sending POST to:', url);
+      
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      console.log('📡 Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ Error response:', errorData);
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Pet created:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error creating pet:', error);
+      throw error;
     }
-
-    const token = await AsyncStorage.getItem('auth_token');
-    
-    const response = await fetch('http://192.168.18.153:3000/pets', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result;
   },
 
   async updatePet(id: string, data: UpdatePetRequest): Promise<PetResponse> {
-    const formData = new FormData();
-    
-    if (data.nombre !== undefined) formData.append('nombre', data.nombre);
-    if (data.tipo !== undefined) formData.append('tipo', data.tipo);
-    if (data.raza !== undefined) formData.append('raza', data.raza);
-    if (data.anos !== undefined) formData.append('anos', String(data.anos));
-    if (data.meses !== undefined) formData.append('meses', String(data.meses));
-    if (data.sexo !== undefined) formData.append('sexo', data.sexo);
-    if (data.tamano !== undefined) formData.append('tamano', data.tamano);
-    if (data.estadoVacunacion !== undefined) formData.append('estadoVacunacion', data.estadoVacunacion);
-    if (data.condicionesMedicas !== undefined) formData.append('condicionesMedicas', data.condicionesMedicas);
-    if (data.numeroVeterinario !== undefined) formData.append('numeroVeterinario', data.numeroVeterinario);
-    if (data.cuidadosEspeciales !== undefined) formData.append('cuidadosEspeciales', data.cuidadosEspeciales);
-    
-    if (data.foto?.isPicker && data.foto?.uri) {
-      formData.append('foto', {
-        uri: data.foto.uri,
-        type: 'image/jpeg',
-        name: 'pet-photo.jpg',
-      } as any);
-    } else if (data.foto) {
-      formData.append('foto', data.foto, 'pet-photo.jpg');
+    try {
+      console.log('🐾 Updating pet', id, 'with data:', data);
+      const formData = new FormData();
+      
+      if (data.nombre !== undefined) formData.append('nombre', data.nombre);
+      if (data.tipo !== undefined) formData.append('tipo', data.tipo);
+      if (data.raza !== undefined) formData.append('raza', data.raza);
+      if (data.anos !== undefined) formData.append('anos', String(data.anos));
+      if (data.meses !== undefined) formData.append('meses', String(data.meses));
+      if (data.sexo !== undefined) formData.append('sexo', data.sexo);
+      if (data.tamano !== undefined) formData.append('tamano', data.tamano);
+      if (data.estadoVacunacion !== undefined) formData.append('estadoVacunacion', data.estadoVacunacion);
+      if (data.condicionesMedicas !== undefined) formData.append('condicionesMedicas', data.condicionesMedicas);
+      if (data.numeroVeterinario !== undefined) formData.append('numeroVeterinario', data.numeroVeterinario);
+      if (data.cuidadosEspeciales !== undefined) formData.append('cuidadosEspeciales', data.cuidadosEspeciales);
+      
+      if (data.foto?.isPicker && data.foto?.uri) {
+        console.log('📷 Adding photo:', data.foto.uri);
+        formData.append('foto', {
+          uri: data.foto.uri,
+          type: 'image/jpeg',
+          name: 'pet-photo.jpg',
+        } as any);
+      } else if (data.foto) {
+        formData.append('foto', data.foto, 'pet-photo.jpg');
+      }
+
+      const token = await AsyncStorage.getItem('auth_token');
+      const url = `${process.env.EXPO_PUBLIC_API_BASE_URL}/pets/${id}`;
+      console.log('📤 Sending PATCH to:', url);
+      
+      const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData,
+      });
+
+      console.log('📡 Response status:', response.status);
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('❌ Error response:', errorData);
+        throw new Error(errorData.message || `HTTP ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('✅ Pet updated:', result);
+      return result;
+    } catch (error) {
+      console.error('❌ Error updating pet:', error);
+      throw error;
     }
-
-    const token = await AsyncStorage.getItem('auth_token');
-    
-    const response = await fetch(`http://192.168.18.153:3000/pets/${id}`, {
-      method: 'PATCH',
-      headers: {
-        'Authorization': `Bearer ${token}`,
-      },
-      body: formData,
-    });
-
-    if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || `HTTP ${response.status}`);
-    }
-
-    const result = await response.json();
-    return result;
   },
 
   /**
