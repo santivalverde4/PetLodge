@@ -109,6 +109,9 @@ export const EditPetScreen: React.FC<ScreenPropsWithRoute> = ({ navigation, rout
           cuidadosEspeciales: cuidadosEspeciales.trim(),
           foto: foto || undefined,
         });
+        Alert.alert('✅ Éxito', 'Mascota actualizada correctamente', [
+          { text: 'OK', onPress: () => navigation.navigate('Pets') }
+        ]);
       } else {
         // Create new pet
         await petsService.createPet({
@@ -125,13 +128,14 @@ export const EditPetScreen: React.FC<ScreenPropsWithRoute> = ({ navigation, rout
           cuidadosEspeciales: cuidadosEspeciales.trim(),
           foto,
         });
+        Alert.alert('✅ Éxito', 'Mascota creada correctamente', [
+          { text: 'OK', onPress: () => navigation.navigate('Pets') }
+        ]);
       }
-
-      navigation.navigate('Pets');
     } catch (err: any) {
       const errorMessage = err?.response?.data?.message || err?.message || 
         (isEditMode ? 'Error al actualizar mascota' : 'Error al crear mascota');
-      Alert.alert('Error', errorMessage);
+      Alert.alert('❌ Error', errorMessage);
     } finally {
       setIsSubmitting(false);
     }
