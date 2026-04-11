@@ -8,7 +8,28 @@ import {
 } from '@aws-sdk/client-s3';
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { randomUUID } from 'crypto';
-import sharp from 'sharp';
+
+type SharpPipeline = {
+  rotate(): SharpPipeline;
+  resize(options: {
+    width: number;
+    height: number;
+    fit: 'inside';
+    withoutEnlargement: boolean;
+  }): SharpPipeline;
+  jpeg(options: { quality: number }): SharpPipeline;
+  toBuffer(): Promise<Buffer>;
+};
+
+type SharpFactory = (input: Buffer) => SharpPipeline;
+
+const sharp = (() => {
+  try {
+    return require('sharp') as SharpFactory;
+  } catch {
+    return null;
+  }
+})();
 
 @Injectable()
 export class StorageService {
@@ -110,7 +131,7 @@ export class StorageService {
     buffer: Buffer,
     mimetype: string,
   ): Promise<{ buffer: Buffer; contentType: string }> {
-    if (!mimetype.startsWith('image/')) {
+    if (!mimetype.startsWith('image/') || !sharp) {
       return { buffer, contentType: mimetype };
     }
 

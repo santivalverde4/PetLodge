@@ -15,9 +15,11 @@ import {
   ValidatorConstraintInterface,
   ValidationArguments,
 } from 'class-validator';
+import { PetSex, PetSize, PetType } from '../../../../generated/prisma/client';
 
-const SEXOS = ['MACHO', 'HEMBRA'] as const;
-const TAMANOS = ['PEQUENO', 'MEDIANO', 'GRANDE'] as const;
+const TIPOS = Object.values(PetType);
+const SEXOS = Object.values(PetSex);
+const TAMANOS = Object.values(PetSize);
 
 // Cross-field rule: anos=0 + meses=0 is never valid.
 // anos=0 + meses≥1 is allowed (young pet). anos≥1 + meses=0 is allowed (exact years).
@@ -48,11 +50,12 @@ export class CreatePetDto {
   @MaxLength(100, { message: 'El nombre no puede exceder 100 caracteres' })
   nombre: string;
 
-  @ApiProperty({ example: 'PERRO' })
-  @IsString({ message: 'El tipo de mascota es requerido' })
+  @ApiProperty({ enum: TIPOS, example: 'PERRO' })
+  @Transform(toUpperCase)
+  @IsIn(TIPOS, { message: 'El tipo debe ser PERRO, GATO, CONEJO, PAJARO u OTRO' })
   @MinLength(2, { message: 'El tipo debe tener al menos 2 caracteres' })
   @MaxLength(50, { message: 'El tipo no puede exceder 50 caracteres' })
-  tipo: string;
+  tipo: PetType;
 
   @ApiProperty({ example: 'Golden Retriever' })
   @IsString({ message: 'La raza es requerida' })
@@ -83,12 +86,12 @@ export class CreatePetDto {
   @ApiProperty({ enum: SEXOS, example: 'MACHO' })
   @Transform(toUpperCase)
   @IsIn(SEXOS, { message: 'El sexo debe ser MACHO o HEMBRA' })
-  sexo: string;
+  sexo: PetSex;
 
   @ApiProperty({ enum: TAMANOS, example: 'MEDIANO' })
   @Transform(toUpperCase)
   @IsIn(TAMANOS, { message: 'El tamaño debe ser PEQUENO, MEDIANO o GRANDE' })
-  tamano: string;
+  tamano: PetSize;
 
   @ApiProperty({ type: String, example: 'Sí, vacunado' })
   @IsString({ message: 'El estado de vacunación debe ser un texto válido' })
