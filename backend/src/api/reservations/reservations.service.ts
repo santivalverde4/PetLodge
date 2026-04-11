@@ -257,8 +257,8 @@ export class ReservationsService {
       where: {
         habitacionId,
         estado: { in: [...ACTIVE_RESERVATION_STATUSES] },
-        fechaEntrada: { lt: fechaSalida },
-        fechaSalida: { gt: fechaEntrada },
+        fechaEntrada: { lte: fechaSalida },
+        fechaSalida: { gte: fechaEntrada },
         ...(excludeReservationId ? { id: { not: excludeReservationId } } : {}),
       },
       select: {
