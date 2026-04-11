@@ -1,0 +1,233 @@
+{
+  "info": {
+    "_postman_id": "c7026706-fad3-453d-bf43-681a8f04f938",
+    "name": "Petlodge",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "40756147",
+    "_collection_link": "https://go.postman.co/collection/40756147-c7026706-fad3-453d-bf43-681a8f04f938?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "Login",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYTMyNmZkMy1jMjcxLTQ4MzYtYjRlZS1jZDM1OTY4NDZkMjUiLCJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTg5MTkxNCwiZXhwIjoxNzc2NDk2NzE0fQ.mYhCyyDlsndkFp9Arv986Eh1IYfwpDf-WoG8QXl9z1w\"",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\"email\": \"admin@admin.com\", \"password\": \"Admin1234\"}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/auth/login",
+          "host": [
+            "{{API_URL}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Templates",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYTMyNmZkMy1jMjcxLTQ4MzYtYjRlZS1jZDM1OTY4NDZkMjUiLCJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTg5MjExMSwiZXhwIjoxNzc2NDk2OTExfQ.4U8MilbZrB6fvkQ5wqAcg8ga6qU637M59sPihU7ReI0",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT}}"
+          }
+        ],
+        "url": {
+          "raw": "{{API_URL}}/notifications/templates",
+          "host": [
+            "{{API_URL}}"
+          ],
+          "path": [
+            "notifications",
+            "templates"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Send Hospedaje",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJmYTMyNmZkMy1jMjcxLTQ4MzYtYjRlZS1jZDM1OTY4NDZkMjUiLCJlbWFpbCI6ImFkbWluQGFkbWluLmNvbSIsImlzQWRtaW4iOnRydWUsImlhdCI6MTc3NTg5MjExMSwiZXhwIjoxNzc2NDk2OTExfQ.4U8MilbZrB6fvkQ5wqAcg8ga6qU637M59sPihU7ReI0",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userId\": \"{{USER_ID}}\",\n    \"reservaId\": \"{{RESERVATION_ID}}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/notifications/send/:templateId",
+          "host": [
+            "{{API_URL}}"
+          ],
+          "path": [
+            "notifications",
+            "send",
+            ":templateId"
+          ],
+          "variable": [
+            {
+              "key": "templateId",
+              "value": "c7733659-d6ae-457d-8ae8-e12091a76203"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Send Fin",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZjRlNDIzYi1hZDgyLTQ0YmMtODZjOS01MGRmMjJjZTExNzEiLCJlbWFpbCI6ImJyaWFucmFtaXJlejAxYXJpYXNAZ21haWwuY29tIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNzc1ODg5ODMzLCJleHAiOjE3NzY0OTQ2MzN9.CSS-QRhxpB4p4159OeBhkWhZnjXtTU3xKEKtZWGTcQw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userId\": \"{{USER_ID}}\",\n    \"reservaId\": \"{{RESERVATION_ID}}\"\n  }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/notifications/send/bdcc5a0d-5d52-43e7-b09d-128c73113574",
+          "host": [
+            "{{API_URL}}"
+          ],
+          "path": [
+            "notifications",
+            "send",
+            "bdcc5a0d-5d52-43e7-b09d-128c73113574"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Send Estado",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIwZjRlNDIzYi1hZDgyLTQ0YmMtODZjOS01MGRmMjJjZTExNzEiLCJlbWFpbCI6ImJyaWFucmFtaXJlejAxYXJpYXNAZ21haWwuY29tIiwiaXNBZG1pbiI6dHJ1ZSwiaWF0IjoxNzc1ODg5ODMzLCJleHAiOjE3NzY0OTQ2MzN9.CSS-QRhxpB4p4159OeBhkWhZnjXtTU3xKEKtZWGTcQw",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Bearer {{JWT}}"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"userId\": \"{{USER_ID}}\",\n    \"reservaId\": \"{{RESERVATION_ID}}\",\n    \"variables\": {\n      \"estado\": \"Tu mascota esta comiendo bien y muy activa\"\n    }\n  }",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{API_URL}}/notifications/send/44e5ce04-ffa6-4ce6-b065-fc048e548d06",
+          "host": [
+            "{{API_URL}}"
+          ],
+          "path": [
+            "notifications",
+            "send",
+            "44e5ce04-ffa6-4ce6-b065-fc048e548d06"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
