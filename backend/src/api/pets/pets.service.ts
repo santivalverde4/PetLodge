@@ -1,6 +1,6 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { Pet, PetSex, PetSize } from '../../../generated/prisma/client';
+import { Pet, PetSex, PetSize, ReservationStatus } from '../../../generated/prisma/client';
 import { PrismaService } from '../../prisma/prisma.service';
 import { StorageService } from '../../storage/storage.service';
 import { CreatePetDto } from './dto/create-pet.dto';
@@ -108,10 +108,25 @@ export class PetsService {
 
   async remove(id: string, userId: string): Promise<void> {
     await this.assertOwnership(id, userId);
+    await this.assertNoActiveReservations(id);
     await this.prisma.pet.update({
       where: { id },
       data: { isActive: false },
     });
+  }
+
+  private async assertNoActiveReservations(petId: string): Promise<void> {
+    const active = await this.prisma.reservation.findFirst({
+      where: {
+        mascotaId: petId,
+        estado: { in: [ReservationStatus.CONFIRMADA, ReservationStatus.EN_PROGRESO] },
+      },
+      select: { id: true },
+    });
+
+    if (active) {
+      throw new BadRequestException('No se puede eliminar una mascota con reservas activas');
+    }
   }
 
   // Verifies ownership and returns the raw Pet record (needed for foto/tamano before mapping).
