@@ -7,6 +7,9 @@ export class RoomResponseDto {
   @ApiProperty({ example: '101' })
   numero: string;
 
+  @ApiPropertyOptional({ example: 101, description: 'Numero de habitacion como entero.' })
+  numeroInt?: number;
+
   @ApiPropertyOptional({
     example: true,
     description: 'Whether the room is available for the requested date range. Only present when from/to are provided.',

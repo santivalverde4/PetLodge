@@ -45,7 +45,12 @@ export class RoomsService {
     const pageRooms = allRooms.slice(skip, skip + PAGE_SIZE);
 
     const data: RoomResponseDto[] = pageRooms.map((room) => {
-      const result: RoomResponseDto = { id: room.id, numero: room.numero };
+      const numeroInt = Number.parseInt(room.numero, 10);
+      const result: RoomResponseDto = {
+        id: room.id,
+        numero: room.numero,
+        numeroInt: Number.isNaN(numeroInt) ? undefined : numeroInt,
+      };
       if (dateRange) {
         result.disponible = (room.reservations ?? []).length === 0;
       }

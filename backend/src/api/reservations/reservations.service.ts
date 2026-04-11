@@ -6,9 +6,11 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { Prisma, ReservationStatus, TipoNotificacion } from '../../../generated/prisma/client';
 import { errorResponse } from '../../common/errors/error-response';
 import { PrismaService } from '../../prisma/prisma.service';
+import { StorageService } from '../../storage/storage.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { CreateReservationDto } from './dto/create-reservation.dto';
 import { UpdateReservationDto } from './dto/update-reservation.dto';
@@ -16,6 +18,7 @@ import { UpdateReservationDto } from './dto/update-reservation.dto';
 const ACTIVE_RESERVATION_STATUSES = [
   ReservationStatus.CONFIRMADA,
   ReservationStatus.EN_PROGRESO,
+  ReservationStatus.COMPLETADA,
 ] as const;
 
 const reservationInclude = {
@@ -25,6 +28,7 @@ const reservationInclude = {
       nombre: true,
       userId: true,
       isActive: true,
+      foto: true,
     },
   },
   room: {
@@ -44,6 +48,8 @@ export class ReservationsService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly notificationsService: NotificationsService,
+    private readonly storage: StorageService,
+    private readonly config: ConfigService,
   ) {}
 
   async create(userId: string, dto: CreateReservationDto) {
@@ -99,7 +105,7 @@ export class ReservationsService {
       reservation.id,
     );
 
-    return this.toResponse(reservation);
+    return await this.toResponse(reservation);
   }
 
   getStatuses(): ReservationStatus[] {
@@ -116,12 +122,12 @@ export class ReservationsService {
       orderBy: [{ fechaEntrada: 'desc' }, { fechaCreacion: 'desc' }],
     });
 
-    return reservations.map((reservation) => this.toResponse(reservation));
+    return Promise.all(reservations.map((reservation) => this.toResponse(reservation)));
   }
 
   async findOne(id: string, userId: string) {
     const reservation = await this.assertReservationOwnership(id, userId);
-    return this.toResponse(reservation);
+    return await this.toResponse(reservation);
   }
 
   async update(id: string, userId: string, dto: UpdateReservationDto) {
@@ -141,7 +147,7 @@ export class ReservationsService {
       dto.fechaSalida === undefined &&
       dto.serviciosAdicionales === undefined
     ) {
-      return this.toResponse(reservation);
+      return await this.toResponse(reservation);
     }
 
     const fechaEntrada = dto.fechaEntrada
@@ -160,7 +166,12 @@ export class ReservationsService {
       reservation.esEspecial ? 'especial' : 'estandar',
       serviciosAdicionales,
     );
-    await this.assertPetAvailability(reservation.mascotaId, fechaEntrada, fechaSalida, reservation.id);
+    await this.assertPetAvailability(
+      reservation.mascotaId,
+      fechaEntrada,
+      fechaSalida,
+      reservation.id,
+    );
     await this.assertRoomAvailability(
       reservation.habitacionId,
       fechaEntrada,
@@ -200,7 +211,7 @@ export class ReservationsService {
       updatedReservation.id,
     );
 
-    return this.toResponse(updatedReservation);
+    return await this.toResponse(updatedReservation);
   }
 
   async remove(id: string, userId: string): Promise<void> {
@@ -283,7 +294,7 @@ export class ReservationsService {
     const overlappingReservation = await this.prisma.reservation.findFirst({
       where: {
         habitacionId,
-        estado: { in: [...ACTIVE_RESERVATION_STATUSES] },
+        estado: { not: ReservationStatus.CANCELADA },
         fechaEntrada: { lte: fechaSalida },
         fechaSalida: { gte: fechaEntrada },
         ...(excludeReservationId ? { id: { not: excludeReservationId } } : {}),
@@ -312,20 +323,19 @@ export class ReservationsService {
     const overlappingReservation = await this.prisma.reservation.findFirst({
       where: {
         mascotaId,
-        estado: { in: [...ACTIVE_RESERVATION_STATUSES] },
+        estado: { not: ReservationStatus.CANCELADA },
         fechaEntrada: { lte: fechaSalida },
         fechaSalida: { gte: fechaEntrada },
         ...(excludeReservationId ? { id: { not: excludeReservationId } } : {}),
       },
-      select: { id: true },
+      select: {
+        id: true,
+      },
     });
 
     if (overlappingReservation) {
       throw new ConflictException(
-        errorResponse(
-          'PET_ALREADY_RESERVED',
-          'La mascota ya tiene una reserva activa en el rango de fechas solicitado',
-        ),
+        'La mascota ya tiene una reserva activa en el rango de fechas solicitado',
       );
     }
   }
@@ -419,12 +429,17 @@ export class ReservationsService {
     return services.join(',');
   }
 
-  private toResponse(reservation: ReservationWithRelations) {
+  private async toResponse(reservation: ReservationWithRelations) {
+    const fotoMascota = await this.resolvePetPhoto(
+      reservation.pet.foto ?? null,
+      reservation.pet.nombre,
+    );
     return {
       id: reservation.id,
       mascotaId: reservation.mascotaId,
       habitacionId: reservation.habitacionId,
       nombreMascota: reservation.pet.nombre,
+      fotoMascota,
       habitacion: reservation.room.numero,
       fechaEntrada: this.formatDateForResponse(reservation.fechaEntrada),
       fechaSalida: this.formatDateForResponse(reservation.fechaSalida),
@@ -434,5 +449,11 @@ export class ReservationsService {
       estado: reservation.estado,
       fechaCreacion: reservation.fechaCreacion.toISOString(),
     };
+  }
+
+  private async resolvePetPhoto(foto: string | null, nombre: string): Promise<string> {
+    const rawFoto =
+      foto || `${this.config.getOrThrow<string>('AVATAR_API')}${encodeURIComponent(nombre)}`;
+    return this.storage.presignUrl(rawFoto);
   }
 }
