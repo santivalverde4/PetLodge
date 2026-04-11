@@ -54,7 +54,6 @@ export const NewReservationScreen: React.FC<ScreenProps> = ({
   const [totalPages, setTotalPages] = useState(1);
   const [loadingPets, setLoadingPets] = useState(true);
   const [loadingRooms, setLoadingRooms] = useState(false);
-  const [generalError, setGeneralError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast, showToast } = useToast();
 
@@ -86,12 +85,10 @@ export const NewReservationScreen: React.FC<ScreenProps> = ({
   const loadPets = async () => {
     try {
       setLoadingPets(true);
-      setGeneralError(null);
       const data = await petsService.getPets();
       setPets(data as Mascota[]);
     } catch (err: any) {
-      const errorMessage = getFriendlyErrorMessage(err, 'Error al cargar mascotas');
-      setGeneralError(errorMessage);
+      showToast(getFriendlyErrorMessage(err, 'Error al cargar mascotas'), 'error');
     } finally {
       setLoadingPets(false);
     }
@@ -273,12 +270,6 @@ export const NewReservationScreen: React.FC<ScreenProps> = ({
         <ScrollView contentContainerStyle={styles.content}>
           <Text style={styles.title}>Nueva reserva</Text>
           <Text style={styles.requiredNote}>* Campos obligatorios</Text>
-
-          {generalError && (
-            <View style={{ backgroundColor: Colors.error + '20', padding: 12, borderRadius: 8, marginBottom: 16 }}>
-              <Text style={{ color: Colors.error }}>{generalError}</Text>
-            </View>
-          )}
 
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>

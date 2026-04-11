@@ -116,7 +116,9 @@ export const petsService = {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('❌ Error response:', errorData);
-        throw new Error(errorData.message || `HTTP ${response.status}`);
+        const fetchError: any = new Error(errorData.message || `HTTP ${response.status}`);
+        fetchError.response = { data: errorData };
+        throw fetchError;
       }
 
       const result = await response.json();
@@ -174,7 +176,9 @@ export const petsService = {
       if (!response.ok) {
         const errorData = await response.json();
         console.error('❌ Error response:', errorData);
-        throw new Error(errorData.message || `HTTP ${response.status}`);
+        const fetchError: any = new Error(errorData.message || `HTTP ${response.status}`);
+        fetchError.response = { data: errorData };
+        throw fetchError;
       }
 
       const result = await response.json();

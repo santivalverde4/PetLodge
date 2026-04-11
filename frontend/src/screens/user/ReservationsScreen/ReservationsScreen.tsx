@@ -37,14 +37,14 @@ export const ReservationsScreen: React.FC<ScreenProps> = ({ navigation }) => {
   const [reservations, setReservations] = useState<Reserva[]>([]);
   const [statuses, setStatuses] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [filter, setFilter] = useState<FilterType>('all');
   const { toast, showToast } = useToast();
 
   const loadReservations = async (currentFilter: FilterType = 'all') => {
     try {
       setLoading(true);
-      setError(null);
+      setLoadFailed(false);
       const estado = currentFilter === 'all' ? undefined : currentFilter;
       const [data, statusList] = await Promise.all([
         reservationsService.getReservations(estado),
@@ -53,8 +53,8 @@ export const ReservationsScreen: React.FC<ScreenProps> = ({ navigation }) => {
       setReservations(data as Reserva[]);
       setStatuses(statusList);
     } catch (err: any) {
-      const errorMessage = getFriendlyErrorMessage(err, 'Error al cargar reservas');
-      setError(errorMessage);
+      setLoadFailed(true);
+      showToast(getFriendlyErrorMessage(err, 'Error al cargar reservas'), 'error');
     } finally {
       setLoading(false);
     }
@@ -136,9 +136,8 @@ export const ReservationsScreen: React.FC<ScreenProps> = ({ navigation }) => {
         <View style={[styles.content, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
           <ActivityIndicator size="large" color={Colors.primary} />
         </View>
-      ) : error ? (
+      ) : loadFailed ? (
         <View style={[styles.content, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
-          <Text style={styles.emptyText}>{error}</Text>
           <Button
             title="Reintentar"
             onPress={loadReservations}

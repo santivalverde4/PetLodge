@@ -24,7 +24,7 @@ export const PetsScreen: React.FC<ScreenProps> = ({ navigation }) => {
   const [pets, setPets] = useState<Mascota[]>([]);
   const [loading, setLoading] = useState(true);
   const [deleting, setDeleting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const { toast, showToast } = useToast();
 
   const isSupabaseUrl = (url: string) => {
@@ -49,7 +49,7 @@ export const PetsScreen: React.FC<ScreenProps> = ({ navigation }) => {
   const loadPets = async () => {
     try {
       setLoading(true);
-      setError(null);
+      setLoadFailed(false);
       const data = await petsService.getPets();
       setPets(
         data.map((pet) => ({
@@ -58,8 +58,8 @@ export const PetsScreen: React.FC<ScreenProps> = ({ navigation }) => {
         }))
       );
     } catch (err: any) {
-      const errorMessage = getFriendlyErrorMessage(err, 'Error al cargar mascotas');
-      setError(errorMessage);
+      setLoadFailed(true);
+      showToast(getFriendlyErrorMessage(err, 'Error al cargar mascotas'), 'error');
     } finally {
       setLoading(false);
     }
@@ -113,11 +113,10 @@ export const PetsScreen: React.FC<ScreenProps> = ({ navigation }) => {
     );
   }
 
-  if (error) {
+  if (loadFailed) {
     return (
       <SafeAreaView style={styles.container}>
         <View style={[styles.content, { justifyContent: 'center', alignItems: 'center', flex: 1 }]}>
-          <Text style={styles.emptyText}>{error}</Text>
           <Button
             title="Reintentar"
             onPress={loadPets}

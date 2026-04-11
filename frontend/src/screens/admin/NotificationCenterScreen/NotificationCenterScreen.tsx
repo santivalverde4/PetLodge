@@ -22,7 +22,7 @@ export const NotificationCenterScreen: React.FC<ScreenProps> = ({ navigation }) 
   const [templates, setTemplates] = useState<Record<string, NotificationTemplate>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [templatesList, setTemplatesList] = useState<NotificationTemplate[]>([]);
   const { toast, showToast } = useToast();
 
@@ -33,7 +33,7 @@ export const NotificationCenterScreen: React.FC<ScreenProps> = ({ navigation }) 
   const loadTemplates = async () => {
     try {
       setIsLoading(true);
-      setError(null);
+      setLoadFailed(false);
       const list = await notificationsService.getTemplates();
       setTemplatesList(list);
       
@@ -50,9 +50,8 @@ export const NotificationCenterScreen: React.FC<ScreenProps> = ({ navigation }) 
         setSelectedTemplateId(list[0].id);
       }
     } catch (err: any) {
-      const errorMessage = getFriendlyErrorMessage(err, 'Error al cargar plantillas');
-      setError(errorMessage);
-      showToast(errorMessage, 'error');
+      setLoadFailed(true);
+      showToast(getFriendlyErrorMessage(err, 'Error al cargar plantillas'), 'error');
     } finally {
       setIsLoading(false);
     }
@@ -129,14 +128,12 @@ export const NotificationCenterScreen: React.FC<ScreenProps> = ({ navigation }) 
             <ActivityIndicator size="large" color="#FF6B6B" />
             <Text style={styles.loadingText}>Cargando plantillas...</Text>
           </View>
-        ) : error ? (
+        ) : loadFailed ? (
           <View style={styles.errorContainer}>
-            <Text style={styles.errorText}>{error}</Text>
             <Button
               title="Reintentar"
               onPress={loadTemplates}
               fullWidth
-              style={{ marginTop: 16 }}
             />
           </View>
         ) : templatesList.length === 0 ? (

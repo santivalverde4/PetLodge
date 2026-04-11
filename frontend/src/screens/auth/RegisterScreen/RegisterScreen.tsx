@@ -8,15 +8,17 @@ import {
   Platform,
 } from 'react-native';
 import { Button } from '@/src/components/ui/Button';
+import { Toast } from '@/src/components/ui/Toast';
 import { Input } from '@/src/components/ui/Input';
 import { ScreenProps } from '@/src/types';
 import { useAuth } from '@/src/context/AuthContext';
-import { Colors, Spacing } from '@/src/utils/theme';
+import { useToast } from '@/src/hooks/useToast';
 import { getFriendlyErrorMessage } from '@/src/utils/errors';
 import { styles } from './RegisterScreen.styles';
 
 export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
   const { register: registerUser, isLoading } = useAuth();
+  const { toast, showToast } = useToast();
 
   const [nombre, setNombre] = useState('');
   const [numeroIdentificacion, setNumeroIdentificacion] = useState('');
@@ -31,7 +33,6 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
   const [numeroTelefonoError, setNumeroTelefonoError] = useState('');
   const [direccionError, setDireccionError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [generalError, setGeneralError] = useState('');
 
   const validateForm = () => {
     let isValid = true;
@@ -41,7 +42,6 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
     setNumeroTelefonoError('');
     setDireccionError('');
     setPasswordError('');
-    setGeneralError('');
 
     if (!nombre) {
       setNombreError('El nombre completo es requerido');
@@ -101,7 +101,6 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
     if (!validateForm()) return;
 
     try {
-      setGeneralError('');
       await registerUser({
         nombre,
         numeroIdentificacion,
@@ -112,12 +111,7 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
       });
       // Navigation will happen automatically when user is set in context
     } catch (error: any) {
-      const code = error?.response?.data?.code;
-      if (code === 'USER_ALREADY_EXISTS') {
-        setGeneralError(error.response.data.message);
-      } else {
-        setGeneralError(getFriendlyErrorMessage(error, 'Error al registrarse'));
-      }
+      showToast(getFriendlyErrorMessage(error, 'Error al registrarse'), 'error');
     }
   };
 
@@ -126,6 +120,7 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
       behavior={Platform.OS === 'android' ? 'height' : undefined}
       style={styles.container}
     >
+      <Toast visible={toast.visible} message={toast.message} type={toast.type} />
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.header}>
@@ -134,24 +129,6 @@ export const RegisterScreen: React.FC<ScreenProps> = ({ navigation }) => {
           </View>
 
           <View style={styles.form}>
-            {generalError ? (
-              <View style={{
-                backgroundColor: '#fee',
-                borderRadius: 8,
-                padding: Spacing.md,
-                marginBottom: Spacing.md,
-                borderLeftWidth: 4,
-                borderLeftColor: Colors.error || '#e74c3c',
-              }}>
-                <Text style={{
-                  color: Colors.error || '#c0392b',
-                  fontSize: 14,
-                  fontWeight: '500',
-                }}>
-                  {generalError}
-                </Text>
-              </View>
-            ) : null}
 
             <Input
               label="Nombre completo"

@@ -32,7 +32,11 @@ export const getFriendlyErrorMessage = (err: any, fallbackMessage: string): stri
   if (!rawMessage) return fallbackMessage || genericMessage;
 
   const msgLower = rawMessage.toLowerCase();
-  if (msgLower.includes('network error') || msgLower.includes('failed to fetch')) {
+  if (
+    msgLower.includes('network error') ||
+    msgLower.includes('network request failed') ||
+    msgLower.includes('failed to fetch')
+  ) {
     return 'Problema de conexion. Verifica tu internet y vuelve a intentar.';
   }
   if (msgLower.includes('timeout')) {

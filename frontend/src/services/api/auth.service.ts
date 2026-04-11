@@ -34,23 +34,15 @@ export const authService = {
    * Login with email and password
    */
   async login(credentials: LoginRequest): Promise<AuthResponse> {
-    try {
-      const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data || error.message;
-    }
+    const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
+    return response.data;
   },
 
   /**
    * Register new user
    */
   async register(data: RegisterRequest): Promise<AuthResponse> {
-    try {
-      const response = await apiClient.post<AuthResponse>('/auth/register', data);
-      return response.data;
-    } catch (error: any) {
-      throw error.response?.data || error.message;
-    }
+    const response = await apiClient.post<AuthResponse>('/auth/register', data);
+    return response.data;
   },
 };

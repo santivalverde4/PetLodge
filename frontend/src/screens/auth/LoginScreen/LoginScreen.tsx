@@ -6,30 +6,29 @@ import {
   ScrollView,
   KeyboardAvoidingView,
   Platform,
-  ActivityIndicator,
 } from 'react-native';
 import { Button } from '@/src/components/ui/Button';
+import { Toast } from '@/src/components/ui/Toast';
 import { Input } from '@/src/components/ui/Input';
 import { ScreenProps } from '@/src/types';
 import { useAuth } from '@/src/context/AuthContext';
-import { Colors, Spacing } from '@/src/utils/theme';
+import { useToast } from '@/src/hooks/useToast';
 import { getFriendlyErrorMessage } from '@/src/utils/errors';
 import { styles } from './LoginScreen.styles';
 
 export const LoginScreen: React.FC<ScreenProps> = ({ navigation }) => {
   const { login, isLoading } = useAuth();
-  
+  const { toast, showToast } = useToast();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [emailError, setEmailError] = useState('');
   const [passwordError, setPasswordError] = useState('');
-  const [generalError, setGeneralError] = useState('');
 
   const validateForm = () => {
     let isValid = true;
     setEmailError('');
     setPasswordError('');
-    setGeneralError('');
 
     if (!email) {
       setEmailError('El correo es requerido');
@@ -51,11 +50,10 @@ export const LoginScreen: React.FC<ScreenProps> = ({ navigation }) => {
     if (!validateForm()) return;
 
     try {
-      setGeneralError('');
       await login({ email, password });
       // Navigation will happen automatically when user is set in context
     } catch (error: any) {
-      setGeneralError(getFriendlyErrorMessage(error, 'Error al iniciar sesión'));
+      showToast(getFriendlyErrorMessage(error, 'Error al iniciar sesión'), 'error');
     }
   };
 
@@ -64,6 +62,7 @@ export const LoginScreen: React.FC<ScreenProps> = ({ navigation }) => {
       behavior={Platform.OS === 'android' ? 'height' : undefined}
       style={styles.container}
     >
+      <Toast visible={toast.visible} message={toast.message} type={toast.type} />
       <SafeAreaView style={styles.container}>
         <ScrollView contentContainerStyle={styles.content}>
           <View style={styles.header}>
@@ -73,24 +72,6 @@ export const LoginScreen: React.FC<ScreenProps> = ({ navigation }) => {
           </View>
 
           <View style={styles.form}>
-            {generalError ? (
-              <View style={{
-                backgroundColor: '#fee',
-                borderRadius: 8,
-                padding: Spacing.md,
-                marginBottom: Spacing.md,
-                borderLeftWidth: 4,
-                borderLeftColor: Colors.error || '#e74c3c',
-              }}>
-                <Text style={{
-                  color: Colors.error || '#c0392b',
-                  fontSize: 14,
-                  fontWeight: '500',
-                }}>
-                  {generalError}
-                </Text>
-              </View>
-            ) : null}
 
             <Input
               label="Correo electrónico"

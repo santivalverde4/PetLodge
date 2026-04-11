@@ -109,20 +109,10 @@ export const EditProfileScreen: React.FC<ScreenPropsWithRoute> = ({
         navigation.goBack();
       }, 800);
     } catch (error: any) {
-      const code = error?.response?.data?.code;
-
-      if (code === 'USER_EMAIL_EXISTS') {
-        setErrors((prev) => ({ ...prev, email: error.response.data.message }));
-      } else if (code === 'USER_ID_EXISTS') {
-        setErrors((prev) => ({ ...prev, numeroIdentificacion: error.response.data.message }));
-      } else {
-        const errorMessage = getFriendlyErrorMessage(
-          error,
-          'Hubo un error actualizando el perfil, vuelva a intentar',
-        );
-        showToast(errorMessage, 'error');
-      }
-
+      showToast(
+        getFriendlyErrorMessage(error, 'Hubo un error actualizando el perfil, vuelva a intentar'),
+        'error',
+      );
       setIsLoading(false);
     }
   };
