@@ -20,6 +20,7 @@ export interface ReservationResponse {
   mascotaId: string;
   habitacionId: string;
   nombreMascota: string;
+  fotoMascota?: string;
   habitacion: string;
   fechaEntrada: string;
   fechaSalida: string;

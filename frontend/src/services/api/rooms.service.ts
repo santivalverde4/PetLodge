@@ -3,6 +3,7 @@ import { apiClient } from './client';
 export interface RoomResponse {
   id: string;
   numero: string;
+  numeroInt?: number;
   disponible?: boolean;
 }
 

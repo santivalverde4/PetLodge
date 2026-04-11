@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -6,6 +6,7 @@ import {
   ScrollView,
   Alert,
   Modal,
+  Image,
 } from 'react-native';
 import { Button } from '@/src/components/ui/Button';
 import { Toast } from '@/src/components/ui/Toast';
@@ -23,6 +24,7 @@ export const ReservationDetailScreen: React.FC<ScreenPropsWithRoute> = ({
 }) => {
   const reserva = route.params?.reservation;
   const [isCancelling, setIsCancelling] = useState(false);
+  const [photoFailed, setPhotoFailed] = useState(false);
   const { toast, showToast } = useToast();
 
   if (!reserva) {
@@ -32,7 +34,7 @@ export const ReservationDetailScreen: React.FC<ScreenPropsWithRoute> = ({
           <Text style={styles.title}>Detalles de la reserva</Text>
           <Text style={Typography.body}>No hay reserva seleccionada.</Text>
           <Button
-            title="Atrás"
+            title="Atras"
             onPress={() => navigation.goBack()}
             variant="secondary"
             fullWidth
@@ -95,7 +97,7 @@ export const ReservationDetailScreen: React.FC<ScreenPropsWithRoute> = ({
   const handleCancel = () => {
     Alert.alert(
       'Cancelar reserva',
-      `¿Estás seguro de que quieres cancelar la reserva de ${reserva.nombreMascota}?`,
+      `Estas seguro de que quieres cancelar la reserva de ${reserva.nombreMascota}?`,
       [
         { text: 'Mantener', onPress: () => {} },
         {
@@ -134,10 +136,25 @@ export const ReservationDetailScreen: React.FC<ScreenPropsWithRoute> = ({
 
         <Card padding={Spacing.lg} margin={0}>
           <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Información de la mascota</Text>
-            <View style={styles.detail}>
-              <Text style={styles.label}>Nombre</Text>
-              <Text style={styles.value}>{reserva.nombreMascota}</Text>
+            <Text style={styles.sectionTitle}>Informacion de la mascota</Text>
+            <View style={styles.petHeader}>
+              {reserva.fotoMascota && !photoFailed ? (
+                <Image
+                  source={{ uri: reserva.fotoMascota }}
+                  style={styles.petAvatarImage}
+                  onError={() => setPhotoFailed(true)}
+                />
+              ) : (
+                <View style={styles.petAvatarFallback}>
+                  <Text style={styles.petAvatarFallbackText}>
+                    {reserva.nombreMascota?.slice(0, 1).toUpperCase()}
+                  </Text>
+                </View>
+              )}
+              <View style={styles.petHeaderText}>
+                <Text style={styles.label}>Nombre</Text>
+                <Text style={styles.value}>{reserva.nombreMascota}</Text>
+              </View>
             </View>
           </View>
 
@@ -152,13 +169,13 @@ export const ReservationDetailScreen: React.FC<ScreenPropsWithRoute> = ({
               <Text style={styles.value}>{reserva.fechaSalida}</Text>
             </View>
             <View style={styles.detail}>
-              <Text style={styles.label}>Habitación</Text>
+              <Text style={styles.label}>Habitacion</Text>
               <Text style={styles.value}>{reserva.habitacion}</Text>
             </View>
             <View style={styles.detail}>
               <Text style={styles.label}>Tipo de reserva</Text>
               <Text style={styles.value}>
-                {reserva.esEspecial ? 'Especial' : 'Estándar'}
+                {reserva.esEspecial ? 'Especial' : 'Estandar'}
               </Text>
             </View>
           </View>
@@ -170,7 +187,7 @@ export const ReservationDetailScreen: React.FC<ScreenPropsWithRoute> = ({
                 {reserva.serviciosAdicionales && reserva.serviciosAdicionales.length > 0 ? (
                   reserva.serviciosAdicionales.map((servicio, index) => (
                     <Text key={index} style={styles.servicioTag}>
-                      • {servicio}
+                      * {servicio}
                     </Text>
                   ))
                 ) : (
@@ -215,7 +232,7 @@ export const ReservationDetailScreen: React.FC<ScreenPropsWithRoute> = ({
         )}
 
         <Button
-          title="Atrás"
+          title="Atras"
           onPress={() => navigation.goBack()}
           variant="secondary"
           fullWidth

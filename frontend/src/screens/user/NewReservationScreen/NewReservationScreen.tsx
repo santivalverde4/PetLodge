@@ -8,6 +8,7 @@ import {
   Modal,
   Platform,
   Pressable,
+  Image,
   ActivityIndicator,
 } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -48,7 +49,7 @@ export const NewReservationScreen: React.FC<ScreenProps> = ({
   navigation,
 }) => {
   const [pets, setPets] = useState<Mascota[]>([]);
-  const [rooms, setRooms] = useState<Array<{ id: string; name: string; disponible?: boolean }>>([]);
+  const [rooms, setRooms] = useState<Array<{ id: string; name: string; numeroInt?: number; disponible?: boolean }>>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [loadingPets, setLoadingPets] = useState(true);
@@ -69,6 +70,7 @@ export const NewReservationScreen: React.FC<ScreenProps> = ({
   const [serviciosAdicionales, setServiciosAdicionales] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [roomsSearched, setRoomsSearched] = useState(false);
+  const [failedPetPhotos, setFailedPetPhotos] = useState<Record<string, boolean>>({});
 
   const serviciosDisponibles = [
     { id: 'bano', label: 'Baño', icon: '🛁' },
@@ -111,14 +113,29 @@ export const NewReservationScreen: React.FC<ScreenProps> = ({
       const newRooms = response.data.map((room) => ({
         id: room.id,
         name: room.numero,
+        numeroInt: room.numeroInt,
         disponible: room.disponible,
       }));
 
       if (page === 1) {
-        setRooms(newRooms);
+        const sorted = [...newRooms].sort((a, b) => {
+          if (a.numeroInt !== undefined && b.numeroInt !== undefined) {
+            return a.numeroInt - b.numeroInt;
+          }
+          return a.name.localeCompare(b.name);
+        });
+        setRooms(sorted);
         setSelectedHabitacionId(null);
       } else {
-        setRooms((prev) => [...prev, ...newRooms]);
+        setRooms((prev) => {
+          const merged = [...prev, ...newRooms];
+          return merged.sort((a, b) => {
+            if (a.numeroInt !== undefined && b.numeroInt !== undefined) {
+              return a.numeroInt - b.numeroInt;
+            }
+            return a.name.localeCompare(b.name);
+          });
+        });
       }
 
       setCurrentPage(response.page);
@@ -297,9 +314,17 @@ export const NewReservationScreen: React.FC<ScreenProps> = ({
                     onPress={() => setSelectedPetId(mascota.id)}
                     style={[styles.petCard, selectedPetId === mascota.id && styles.petCardSelected]}
                   >
-                    <View style={[styles.petAvatar, { backgroundColor: getPetAvatarColor(mascota.nombre) }]}>
-                      <Text style={styles.petAvatarText}>{getPetInitials(mascota.nombre)}</Text>
-                    </View>
+                    {mascota.foto && !failedPetPhotos[mascota.id] ? (
+                      <Image
+                        source={{ uri: mascota.foto }}
+                        style={styles.petAvatarImage}
+                        onError={() => setFailedPetPhotos((prev) => ({ ...prev, [mascota.id]: true }))}
+                      />
+                    ) : (
+                      <View style={[styles.petAvatar, { backgroundColor: getPetAvatarColor(mascota.nombre) }]}>
+                        <Text style={styles.petAvatarText}>{getPetInitials(mascota.nombre)}</Text>
+                      </View>
+                    )}
                     <View style={styles.petCardInfo}>
                       <Text style={styles.petCardName}>{mascota.nombre}</Text>
                       <Text style={styles.petCardBreed}>

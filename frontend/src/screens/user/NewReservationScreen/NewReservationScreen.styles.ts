@@ -269,6 +269,11 @@ export const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  petAvatarImage: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+  },
   petAvatarText: {
     color: '#fff',
     fontWeight: '700',
